@@ -1,0 +1,8 @@
+# GPU:RTX 50 系列需 cu128 版 torch
+# pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
+torch>=2.7
+torchvision>=0.22
+numpy
+pillow
+opencv-python-headless
+scikit-learn

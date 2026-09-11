@@ -29,6 +29,7 @@ export const DEFECT_CODES: DefectCode[] = [
   { code: "XII", nameZh: "表面粗糙", nameEn: "Surface roughness", responsibility: "supplier", sp55: true },
   { code: "R", nameZh: "鏽蝕", nameEn: "Rust / corrosion", responsibility: "inhouse", common: true, sp55: false },
   { code: "M", nameZh: "加工刮傷 / 碰傷", nameEn: "Machining damage", responsibility: "inhouse", sp55: false },
+  { code: "AI", nameZh: "AI 偵測異常(待分類)", nameEn: "AI-detected anomaly", responsibility: "supplier", sp55: false },
 ];
 
 export const defectByCode = (code: string) => DEFECT_CODES.find((d) => d.code === code);
