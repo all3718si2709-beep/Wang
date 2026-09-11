@@ -6,7 +6,7 @@ import { PageHeader, Card, Badge, Field, Input, Select, Textarea, LinkButton, St
 import { ActionForm } from "@/components/action-form";
 import { Workspace } from "@/components/lot/workspace";
 import { INSPECTION_TYPES, LOT_DISPOSITION_LABEL } from "@/lib/domain";
-import { FileText, Lock, Unlock } from "lucide-react";
+import { FileText, Lock, Unlock, Upload } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +23,7 @@ export default async function LotPage({ params }: { params: Promise<{ id: string
         title={<span className="num">{lot.lotNo} <Badge tone="brand">{lot.inspectionType} {INSPECTION_TYPES[lot.inspectionType]?.nameZh}</Badge> {closed && <Badge tone={lot.disposition === "accept" ? "ok" : lot.disposition === "reject" ? "ng" : "warn"}><Lock className="h-3 w-3 mr-1" />已結批 · {LOT_DISPOSITION_LABEL[lot.disposition ?? ""]}</Badge>}</span>}
         sub={<span><Link href={`/parts/${lot.part.id}`} className="num text-brand hover:underline">{lot.part.partNo}</Link> · {lot.part.name} · {lot.part.customer.name} · 規格 <Link href={`/parts/${lot.part.id}/spec/${lot.specVersionId}`} className="text-brand hover:underline">v{lot.spec.version}</Link> · 開批 {fmtDate(lot.createdAt)}</span>}
         crumbs={[{ href: "/lots", label: "檢驗批" }, { label: lot.lotNo }]}
-        actions={<LinkButton href={`/lots/${lot.id}/report`} variant="secondary"><FileText className="h-4 w-4" />檢驗報告</LinkButton>}
+        actions={<>{!closed && <LinkButton href={`/lots/${lot.id}/import`} variant="secondary"><Upload className="h-4 w-4" />匯入三次元</LinkButton>}<LinkButton href={`/lots/${lot.id}/report`} variant="secondary"><FileText className="h-4 w-4" />檢驗報告</LinkButton></>}
       />
 
       <div className="grid grid-cols-3 md:grid-cols-6 gap-3 mb-5">

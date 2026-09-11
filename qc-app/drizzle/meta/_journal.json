@@ -15,6 +15,13 @@
       "when": 1789105369912,
       "tag": "0001_measurement_attribute",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1789106666887,
+      "tag": "0002_cmm_import",
+      "breakpoints": true
     }
   ]
 }

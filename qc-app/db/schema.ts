@@ -187,6 +187,31 @@ export const visualFindings = sqliteTable(
   (t) => [index("finding_piece").on(t.pieceId)],
 );
 
+/** 三次元特性名稱 ↔ 尺寸項次 對應(每個規格版本存一份,下次自動用) */
+export const cmmFeatureMaps = sqliteTable(
+  "cmm_feature_maps",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    specVersionId: integer("spec_version_id").notNull().references(() => specVersions.id),
+    featureKey: text("feature_key").notNull(),
+    dimensionSpecId: integer("dimension_spec_id").notNull().references(() => dimensionSpecs.id),
+    updatedAt: text("updated_at").notNull().default(now),
+  },
+  (t) => [uniqueIndex("cmm_map_unique").on(t.specVersionId, t.featureKey)],
+);
+
+/** 三次元匯入紀錄(追溯:哪個檔、幾件、幾筆) */
+export const cmmImports = sqliteTable("cmm_imports", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  lotId: integer("lot_id").notNull().references(() => lots.id),
+  fileName: text("file_name").notNull(),
+  encoding: text("encoding"),
+  pieceCount: integer("piece_count").notNull(),
+  measurementCount: integer("measurement_count").notNull(),
+  skipped: text("skipped"),
+  createdAt: text("created_at").notNull().default(now),
+});
+
 /** 系統設定(公司抬頭等,單列 key-value) */
 export const settings = sqliteTable("settings", {
   key: text("key").primaryKey(),

@@ -1,0 +1,5 @@
+Feature name	Actual	Nominal	Upper tol	Lower tol	Dev
+Outer diameter	203.205	203.200	0.100	-0.100	0.005
+Bore	120.041	120.000	0.050	0.000	0.041
+PCD	190.99	191.00	0.200	-0.200	-0.010
+Parallelism	0.012	0.000	0.050	0.000	0.012

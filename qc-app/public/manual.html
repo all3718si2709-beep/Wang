@@ -54,7 +54,7 @@
 </div></header>
 
 <nav class="toc">
-  <a href="#overview">整體流程</a><a href="#case">本說明的案例</a><a href="#s1">1 第一次使用</a><a href="#s2">2 建料號與規格</a><a href="#s3">3 開檢驗批</a><a href="#s4">4 量尺寸</a><a href="#gonogo">4.2 塞規 / 環規</a><a href="#wear">4.5 看趨勢(刀具磨耗)</a><a href="#s5">5 記外觀</a><a href="#s6">6 判定與結批</a><a href="#s7">7 出報告</a><a href="#s8">8 退供應商</a><a href="#ai">AI 檢測</a><a href="#faq">常見問題</a>
+  <a href="#overview">整體流程</a><a href="#case">本說明的案例</a><a href="#s1">1 第一次使用</a><a href="#s2">2 建料號與規格</a><a href="#s3">3 開檢驗批</a><a href="#s4">4 量尺寸</a><a href="#gonogo">4.2 塞規 / 環規</a><a href="#cmm">4.4 匯入三次元</a><a href="#wear">4.5 看趨勢(刀具磨耗)</a><a href="#s5">5 記外觀</a><a href="#s6">6 判定與結批</a><a href="#s7">7 出報告</a><a href="#s8">8 退供應商</a><a href="#ai">AI 檢測</a><a href="#faq">常見問題</a>
 </nav>
 
 <main>
@@ -141,7 +141,7 @@
     <li>拿起<b>分厘卡</b>,點「2. 總厚」的第一格(#1)。</li>
     <li>量 #1 → 藍牙分厘卡按 DATA 鍵(或手打 <code>38.051</code>)→ <kbd>Enter</kbd> → 游標<b>自動跳到 #2</b>。</li>
     <li>一路量到 #30 → 游標自動跳到「4. 密封面高度」的 #1 → 放下分厘卡,換<b>高度規</b>。</li>
-    <li>三次元量的項目(外徑、內孔直徑、PCD…)不在這裡打,三次元報告先歸檔;想手填就勾右上「顯示抽檢 / 首件項次」。</li>
+    <li>三次元量的項目(外徑、內孔直徑、PCD…)不在這裡打,用「匯入三次元」讀報告進來(見 4.4);想手填就勾右上「顯示抽檢 / 首件項次」。</li>
   </ol>
   <div class="say">林志豪量到 #5 打了 38.107,格子變紅 — 超過上限 38.100。不用停下來,先量完,紅的件系統已經記住是「拒收」。</div>
   <h3>逐項 vs 逐件(右上切換)</h3>
@@ -173,6 +173,40 @@
   </table>
   <div class="note"><b>報告上怎麼呈現:</b>尺寸統計那一列不會有 Min / Max / Cpk(沒數值),改印「通 28 / 不通 2」;逐件附錄印「通」「不通」。</div>
   <div class="tip"><b>什麼時候該用塞規、什麼時候該量數字:</b>只要判合不合格的用塞規(快);想看趨勢、算 Cpk、跟客戶談製程能力的用三次元或分厘卡量數字。同一個尺寸也可以兩個項次都建:每件塞規 + 每 10 件三次元。</div>
+</section>
+
+<section id="cmm">
+  <h2><span class="n">4.4</span>匯入三次元報告</h2>
+  <div class="who">誰做:三次元操作員或檢驗員,三次元量完之後</div>
+  <p>三次元量的項次(外徑、內孔、PCD、平行度…)不用手抄。三次元軟體「匯出 CSV / 文字報告」→ 在批頁按「<b>匯入三次元</b>」→ 三步就進系統,而且**任何品牌的三次元都能用**(PC-DMIS、MCOSMOS、Calypso、Rational…),不用等我們寫專用程式。</p>
+  <div class="say">L-260910-001 這批,三次元抽 #3、#4 兩件做全尺寸。操作員在 PC-DMIS 按匯出,得到兩個 CSV(檔頭有 SER NUMBER 3、4),直接丟進系統。</div>
+  <h3>第一步:上傳</h3>
+  <ol class="steps">
+    <li>批頁右上「<b>匯入三次元</b>」。</li>
+    <li>點虛線框選檔,可以一次多選(一檔一件)。Excel 檔請先在 Excel「另存新檔 → CSV」。</li>
+  </ol>
+  <img class="shot" src="manual/17-cmm-1.png" alt="上傳">
+  <h3>第二步:指定欄位(系統會先猜,通常不用改)</h3>
+  <p>系統自動跳過報告上方的抬頭列(零件名、日期),找到表頭,猜出哪一欄是「特性名稱」、哪一欄是「實測值」。猜錯就用下拉改。</p>
+  <img class="shot" src="manual/17-cmm-2.png" alt="指定欄位"><div class="cap">PC-DMIS 的 CSV:FEATURE = 特性、AXIS = 軸、NOMINAL = 標稱、MEAS = 實測,系統全猜對,下面預覽前 8 列讓你核對。</div>
+  <h3>第三步:對應項次與件號</h3>
+  <img class="shot" src="manual/17-cmm-3.png" alt="對應"><div class="cap">3a:三次元的特性名稱(DIM_A_OD、FLATNESS_I…)對到規格的項次。系統靠名稱、圖面位置代號、標稱值去猜,標籤寫出它為什麼這樣猜;不對就用下拉改。3b:每個檔是第幾件(抬頭有序號就自動帶)。3c:預覽每一筆會進哪一件、哪一項、判定是什麼。</div>
+  <ol class="steps">
+    <li><b>3a 對應</b>:檢查每一列。「不匯入」= 這個特性略過(例如三次元多量的參考點)。<b>第一次要人工確認,之後同料號自動套用</b>,不用再對。</li>
+    <li><b>3b 件號</b>:一檔一件時,每個檔對到第幾件;檔內有「件號 / 工件」欄的(一檔多件),指定那一欄後這裡會列出每個件號值對到第幾件。</li>
+    <li><b>3c 預覽</b>看一眼判定沒問題 → 按「匯入 N 筆」。</li>
+  </ol>
+  <img class="shot" src="manual/17-cmm-4.png" alt="完成"><div class="cap">匯入完成:寫入幾筆、更新幾件的判定;略過的會列出原因(件號不在本批、對到塞規項次…)。</div>
+  <h3>之後</h3>
+  <table>
+    <tr><th style="width:36%">情況</th><th>怎麼辦</th></tr>
+    <tr><td>同一件同一項次已經手打過</td><td>預設以三次元值覆蓋(三次元較準);不想覆蓋把勾拿掉</td></tr>
+    <tr><td>三次元特性名稱改了</td><td>下次匯入會多一列「對不到,請選」,選一次就記住</td></tr>
+    <tr><td>報告是 Big5 編碼(舊軟體)</td><td>系統自動偵測,中文不會變亂碼</td></tr>
+    <tr><td>報告是 PDF</td><td>讀不了。請在三次元軟體改匯出 CSV / TXT;幾乎每套都有</td></tr>
+    <tr><td>想少一個動作</td><td>三次元軟體多半能設「量完自動輸出到某資料夾」,設好後每批只要選檔;之後可再做成自動監看資料夾</td></tr>
+  </table>
+  <div class="tip"><b>試試看:</b>系統資料夾 <code>qc-app/samples/cmm/</code> 有三個範例檔(模擬 PC-DMIS、MCOSMOS、Calypso 三種格式),對應示範料號 VD-8-150,拿去匯入就能看整個流程。</div>
 </section>
 
 <section id="wear">
