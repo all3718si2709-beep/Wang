@@ -5,8 +5,8 @@ import path from "node:path";
 import fs from "node:fs/promises";
 import { db } from "@/db";
 import { lots, pieces, measurements, visualFindings, dimensionSpecs, visualSpecs, specVersions } from "@/db/schema";
-import { judgeDimension, judgeFinding, judgePiece } from "@/lib/engine";
-import { defectByCode, ZONES } from "@/lib/domain";
+import { judgeDimension, judgeAttribute, judgeFinding, judgePiece } from "@/lib/engine";
+import { defectByCode, ZONES, isAttributeGauge } from "@/lib/domain";
 import { audit, fail, str, optStr, optNum, type ActionResult } from "./shared";
 
 const PHOTO_DIR = path.join(process.cwd(), "data", "photos");
@@ -70,6 +70,7 @@ export async function saveMeasurement(pieceId: number, dimensionSpecId: number, 
       const pieceVerdict = await rejudgePiece(pieceId);
       return { ok: true, judgement: null, pieceVerdict };
     }
+    if (isAttributeGauge(dim.gauge)) return { ok: false, error: "此項次為塞規 / 環規,請按通 / 不通" };
     if (!Number.isFinite(value)) return { ok: false, error: "不是數字" };
     const r = judgeDimension(dim, value, spec.warnRatio);
     await db
@@ -81,6 +82,31 @@ export async function saveMeasurement(pieceId: number, dimensionSpecId: number, 
       });
     const pieceVerdict = await rejudgePiece(pieceId);
     return { ok: true, judgement: r.judgement, pieceVerdict };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "儲存失敗" };
+  }
+}
+
+/** 塞規 / 環規:通 / 不通;attr 為 null 代表清除 */
+export async function saveAttribute(pieceId: number, dimensionSpecId: number, attr: "go" | "nogo" | null): Promise<SaveMeasurementResult> {
+  try {
+    const { dims } = await loadPieceContext(pieceId);
+    const dim = dims.find((d) => d.id === dimensionSpecId);
+    if (!dim) return { ok: false, error: "尺寸項次不屬於此批的規格" };
+    if (!isAttributeGauge(dim.gauge)) return { ok: false, error: "此項次不是塞規 / 環規" };
+    if (attr == null) {
+      await db.delete(measurements).where(and(eq(measurements.pieceId, pieceId), eq(measurements.dimensionSpecId, dimensionSpecId)));
+      const pieceVerdict = await rejudgePiece(pieceId);
+      return { ok: true, judgement: null, pieceVerdict };
+    }
+    const judgement = judgeAttribute(attr);
+    const now = new Date().toISOString();
+    await db
+      .insert(measurements)
+      .values({ pieceId, dimensionSpecId, value: attr === "go" ? 1 : 0, attribute: attr, judgement, source: "manual", measuredAt: now })
+      .onConflictDoUpdate({ target: [measurements.pieceId, measurements.dimensionSpecId], set: { value: attr === "go" ? 1 : 0, attribute: attr, judgement, source: "manual", measuredAt: now } });
+    const pieceVerdict = await rejudgePiece(pieceId);
+    return { ok: true, judgement, pieceVerdict };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "儲存失敗" };
   }

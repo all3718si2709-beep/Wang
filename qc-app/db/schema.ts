@@ -154,7 +154,10 @@ export const measurements = sqliteTable(
     id: integer("id").primaryKey({ autoIncrement: true }),
     pieceId: integer("piece_id").notNull().references(() => pieces.id),
     dimensionSpecId: integer("dimension_spec_id").notNull().references(() => dimensionSpecs.id),
+    /** 數值量具:量測值。屬性量具(塞規 / 環規):GO=1、NO-GO=0(統計時排除) */
     value: real("value").notNull(),
+    /** 屬性量測:go 通 / nogo 不通;數值量測為 null */
+    attribute: text("attribute", { enum: ["go", "nogo"] }),
     judgement: text("judgement", { enum: ["OK", "WARN", "NG"] }).notNull(),
     source: text("source", { enum: ["manual", "bluetooth", "cmm_import"] }).notNull().default("manual"),
     measuredAt: text("measured_at").notNull().default(now),

@@ -51,3 +51,8 @@ export function judgeDimension(spec: DimSpecLike, value: number, warnRatio = 0.8
 
   return { judgement, deviation, usage, lower, upper };
 }
+
+/** 屬性量測(塞規 / 環規):通 = OK,不通 = NG。沒有警戒帶。 */
+export function judgeAttribute(attr: "go" | "nogo"): DimJudgement {
+  return attr === "go" ? "OK" : "NG";
+}

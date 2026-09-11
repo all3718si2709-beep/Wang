@@ -131,6 +131,14 @@ async function main() {
       const meas: { dimensionSpecId: number; judgement: "OK" | "WARN" | "NG" }[] = [];
       if (i <= measuredCount) {
         for (const dm of measureDims) {
+          if (dm.gauge === "plug_gauge") {
+            // 塞規:通 / 不通
+            const nogo = rnd() < lp.ngRate * 0.25;
+            const judgement = nogo ? "NG" : "OK";
+            meas.push({ dimensionSpecId: dm.id, judgement });
+            await db.insert(measurements).values({ pieceId: pc.id, dimensionSpecId: dm.id, value: nogo ? 0 : 1, attribute: nogo ? "nogo" : "go", judgement, source: "manual", measuredAt: created });
+            continue;
+          }
           const lower = dm.nominal + dm.tolMinus, upper = dm.nominal + dm.tolPlus;
           const half = (upper - lower) / 2;
           const center = (lower + upper) / 2;

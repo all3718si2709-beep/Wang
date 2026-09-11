@@ -59,3 +59,11 @@ describe("judgeDimension 防呆", () => {
     expect(() => judgeDimension(spec, NaN)).toThrow();
   });
 });
+
+describe("judgeAttribute 塞規 / 環規", () => {
+  it("通 → OK,不通 → NG", async () => {
+    const { judgeAttribute } = await import("../dimension");
+    expect(judgeAttribute("go")).toBe("OK");
+    expect(judgeAttribute("nogo")).toBe("NG");
+  });
+});

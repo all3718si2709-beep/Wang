@@ -52,14 +52,17 @@ export const ZONES: Zone[] = [
 
 export const zoneByCode = (code: string) => ZONES.find((z) => z.code === code);
 
-export const GAUGES: Record<string, { nameZh: string; defaultDecimals: number; source: "cmm_import" | "bluetooth" | "manual" }> = {
+export const GAUGES: Record<string, { nameZh: string; defaultDecimals: number; source: "cmm_import" | "bluetooth" | "manual"; attribute?: boolean }> = {
   cmm: { nameZh: "三次元", defaultDecimals: 3, source: "cmm_import" },
   micrometer: { nameZh: "分厘卡", defaultDecimals: 3, source: "bluetooth" },
   height_gauge: { nameZh: "高度規", defaultDecimals: 2, source: "bluetooth" },
   caliper: { nameZh: "游標卡尺", defaultDecimals: 2, source: "bluetooth" },
-  plug_gauge: { nameZh: "塞規 / 環規", defaultDecimals: 2, source: "manual" },
+  /** 屬性量具:只有通 / 不通,沒有數值 */
+  plug_gauge: { nameZh: "塞規 / 環規", defaultDecimals: 2, source: "manual", attribute: true },
   other: { nameZh: "其他", defaultDecimals: 2, source: "manual" },
 };
+
+export const isAttributeGauge = (gauge: string) => !!GAUGES[gauge]?.attribute;
 
 export const FREQUENCIES: Record<string, string> = {
   each: "每件",

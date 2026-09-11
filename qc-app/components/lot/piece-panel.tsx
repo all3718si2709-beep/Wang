@@ -67,7 +67,7 @@ export function PiecePanel({ lot, piece, onClose, onChanged }: { lot: LotDetail;
                       <td className="py-1.5 pr-2 text-ink-3 num w-6">{d.seq}</td>
                       <td className="py-1.5 pr-2">{d.name}<span className="ml-1 text-[11px] text-ink-3">{GAUGES[d.gauge]?.nameZh}</span></td>
                       <td className="py-1.5 pr-2 num text-ink-3 text-right">{d.nominal.toFixed(d.decimals)} {fmtTol(d.tolMinus, d.tolPlus, d.decimals)}</td>
-                      <td className="py-1.5 num text-right font-medium w-20">{m ? m.value.toFixed(d.decimals) : <span className="text-ink-3 font-normal">未量</span>}</td>
+                      <td className="py-1.5 num text-right font-medium w-20">{m ? (m.attribute ? (m.attribute === "go" ? "通" : "不通") : m.value.toFixed(d.decimals)) : <span className="text-ink-3 font-normal">未量</span>}</td>
                       <td className="py-1.5 pl-2 w-14 text-right">{m && <VerdictBadge v={m.judgement} />}</td>
                     </tr>
                   );

@@ -34,7 +34,7 @@ function Row({ specId, dim, onDone }: { specId: number; dim?: DimensionSpec; onD
           <L t="下公差"><Input name="tolMinus" type="number" step="any" defaultValue={dim?.tolMinus} className="h-9 num" placeholder="-0.05" required /></L>
           <L t="上公差"><Input name="tolPlus" type="number" step="any" defaultValue={dim?.tolPlus} className="h-9 num" placeholder="0.05" required /></L>
           <L t="單位"><Input name="unit" defaultValue={dim?.unit ?? "mm"} className="h-9" /></L>
-          <L t="量具"><Select name="gauge" defaultValue={dim?.gauge ?? "micrometer"} className="h-9">{gaugeOpts.map(([k, g]) => <option key={k} value={k}>{g.nameZh}</option>)}</Select></L>
+          <L t="量具"><Select name="gauge" defaultValue={dim?.gauge ?? "micrometer"} className="h-9" title="塞規 / 環規 = 通 / 不通按鈕,無數值">{gaugeOpts.map(([k, g]) => <option key={k} value={k}>{g.nameZh}{g.attribute ? "(通/不通)" : ""}</option>)}</Select></L>
           <L t="頻率"><Select name="frequency" defaultValue={dim?.frequency ?? "each"} className="h-9">{freqOpts.map(([k, v]) => <option key={k} value={k}>{v}</option>)}</Select></L>
           <L t="小數"><Input name="decimals" type="number" min={0} max={4} defaultValue={dim?.decimals ?? 3} className="h-9 num" /></L>
           <div className="flex items-center gap-2 h-9">

@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getLotDetail, getSettings } from "@/lib/queries";
-import { INSPECTION_TYPES, LOT_DISPOSITION_LABEL, VERDICT_LABEL, DISPOSITION_LABEL, GAUGES, DEFECT_CODES, defectByCode, zoneByCode } from "@/lib/domain";
+import { INSPECTION_TYPES, LOT_DISPOSITION_LABEL, VERDICT_LABEL, DISPOSITION_LABEL, GAUGES, DEFECT_CODES, defectByCode, zoneByCode, isAttributeGauge } from "@/lib/domain";
 import { fmt, fmtTol, fmtDate, fmtDay } from "@/components/ui";
 import { PrintButton } from "@/components/print-button";
 
@@ -82,10 +82,16 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
                   <td>{fmtTol(d.tolMinus, d.tolPlus, d.decimals)}</td>
                   <td className="font-sans">{GAUGES[d.gauge]?.nameZh}</td>
                   <td>{st.n}</td>
-                  <td>{fmt(st.min, d.decimals)}</td>
-                  <td>{fmt(st.max, d.decimals)}</td>
-                  <td>{fmt(st.mean, d.decimals)}</td>
-                  <td>{st.cpk == null ? "—" : st.cpk.toFixed(2)}</td>
+                  {isAttributeGauge(d.gauge) ? (
+                    <td colSpan={4} className="font-sans">通 {st.ok} / 不通 {st.ng}(屬性量測,無數值)</td>
+                  ) : (
+                    <>
+                      <td>{fmt(st.min, d.decimals)}</td>
+                      <td>{fmt(st.max, d.decimals)}</td>
+                      <td>{fmt(st.mean, d.decimals)}</td>
+                      <td>{st.cpk == null ? "—" : st.cpk.toFixed(2)}</td>
+                    </>
+                  )}
                   <td className={`font-sans font-semibold ${st.ng > 0 ? "text-ng" : st.n === 0 ? "text-ink-3" : "text-ok"}`}>{st.n === 0 ? "未量" : st.ng > 0 ? `NG ×${st.ng}` : "OK"}</td>
                 </tr>
               ))}
@@ -126,7 +132,7 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
               <thead><tr><th>件號</th><th className="text-left">拒收原因</th><th>處置</th></tr></thead>
               <tbody>
                 {ngPieces.map((p) => {
-                  const dimNg = p.measurements.filter((m) => m.judgement === "NG").map((m) => { const d = lot.dims.find((x) => x.id === m.dimensionSpecId)!; return `${d.name} ${m.value.toFixed(d.decimals)}(${d.nominal.toFixed(d.decimals)} ${fmtTol(d.tolMinus, d.tolPlus, d.decimals)})`; });
+                  const dimNg = p.measurements.filter((m) => m.judgement === "NG").map((m) => { const d = lot.dims.find((x) => x.id === m.dimensionSpecId)!; return m.attribute ? `${d.name} 塞規不通` : `${d.name} ${m.value.toFixed(d.decimals)}(${d.nominal.toFixed(d.decimals)} ${fmtTol(d.tolMinus, d.tolPlus, d.decimals)})`; });
                   const visNg = p.findings.filter((f) => f.judgement === "NG").map((f) => `${f.defectCode} ${defectByCode(f.defectCode)?.nameZh} @ ${zoneByCode(f.zone)?.nameZh}${f.sizeMm != null ? ` ${f.sizeMm}mm` : ""}${f.count > 1 ? ` ×${f.count}` : ""}`);
                   return (
                     <tr key={p.id}>
@@ -165,7 +171,7 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
                 {lot.pieces.map((p) => (
                   <tr key={p.id} className="num text-center">
                     <td>#{p.seqNo}</td>
-                    {lot.dims.map((d) => { const m = p.measurements.find((x) => x.dimensionSpecId === d.id); return <td key={d.id} className={m?.judgement === "NG" ? "text-ng font-semibold" : m?.judgement === "WARN" ? "text-warn" : ""}>{m ? m.value.toFixed(d.decimals) : ""}</td>; })}
+                    {lot.dims.map((d) => { const m = p.measurements.find((x) => x.dimensionSpecId === d.id); return <td key={d.id} className={m?.judgement === "NG" ? "text-ng font-semibold" : m?.judgement === "WARN" ? "text-warn" : ""}>{m ? (m.attribute ? (m.attribute === "go" ? "通" : "不通") : m.value.toFixed(d.decimals)) : ""}</td>; })}
                     <td className="font-sans">{p.findings.length ? p.findings.map((f) => f.defectCode).join(",") : ""}</td>
                     <td className={`font-sans font-semibold ${p.effectiveVerdict === "NG" ? "text-ng" : p.effectiveVerdict === "OK" ? "text-ok" : "text-ink-3"}`}>{VERDICT_LABEL[p.effectiveVerdict]}</td>
                   </tr>

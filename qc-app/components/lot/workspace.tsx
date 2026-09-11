@@ -2,10 +2,10 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { LotDetail } from "@/lib/queries";
-import { saveMeasurement } from "@/lib/actions/inspection";
+import { saveMeasurement, saveAttribute } from "@/lib/actions/inspection";
 import { judgeDimension } from "@/lib/engine";
 import { VerdictBadge, fmtTol } from "@/components/ui";
-import { GAUGES, FREQUENCIES } from "@/lib/domain";
+import { GAUGES, FREQUENCIES, isAttributeGauge } from "@/lib/domain";
 import { PiecePanel } from "./piece-panel";
 import { ArrowDownToLine, ArrowRightToLine, Bluetooth, Camera } from "lucide-react";
 
@@ -53,8 +53,9 @@ export function Workspace({ lot }: { lot: LotDetail }) {
       if (order === "row") { ndi++; if (ndi >= dims.length) { ndi = 0; npi++; } }
       else { npi++; if (npi >= lot.pieces.length) { npi = 0; ndi++; } }
       if (npi >= lot.pieces.length || ndi >= dims.length) return;
-      const el = refs.current.get(key(lot.pieces[npi].id, dims[ndi].id));
-      el?.focus(); el?.select();
+      const el = refs.current.get(key(lot.pieces[npi].id, dims[ndi].id)) as HTMLElement | undefined;
+      el?.focus();
+      if (el instanceof HTMLInputElement) el.select();
     },
     [order, dims, lot.pieces],
   );
@@ -88,6 +89,20 @@ export function Workspace({ lot }: { lot: LotDetail }) {
       if (r.pieceVerdict) setVerdictOv((v) => ({ ...v, [pieceId]: r.pieceVerdict! }));
     },
     [lot.dims, lot.spec.warnRatio],
+  );
+
+  const commitAttr = useCallback(
+    async (pieceId: number, dimId: number, attr: "go" | "nogo" | null) => {
+      const k = key(pieceId, dimId);
+      setJudgeOv((j) => ({ ...j, [k]: attr == null ? null : attr === "go" ? "OK" : "NG" }));
+      setSaving((s) => ({ ...s, [k]: true }));
+      const r = await saveAttribute(pieceId, dimId, attr);
+      setSaving((s) => ({ ...s, [k]: false }));
+      if (!r.ok) { alert(r.error); return; }
+      setJudgeOv((j) => ({ ...j, [k]: r.judgement ?? null }));
+      if (r.pieceVerdict) setVerdictOv((v) => ({ ...v, [pieceId]: r.pieceVerdict! }));
+    },
+    [],
   );
 
   const counts = useMemo(() => {
@@ -126,7 +141,7 @@ export function Workspace({ lot }: { lot: LotDetail }) {
               {dims.map((d) => (
                 <th key={d.id} className="px-1.5 py-2 border-b border-line text-left align-bottom min-w-[128px]">
                   <div className="text-[12.5px] font-semibold text-ink leading-tight">{d.seq}. {d.name}{d.critical && <span className="ml-1 text-[10px] text-brand">CTQ</span>}</div>
-                  <div className="num text-[11.5px] text-ink-3 leading-tight">{d.nominal.toFixed(d.decimals)} <span className="text-ink-3/70">{fmtTol(d.tolMinus, d.tolPlus, d.decimals)}</span></div>
+                  <div className="num text-[11.5px] text-ink-3 leading-tight">{d.nominal.toFixed(d.decimals)} <span className="text-ink-3/70">{fmtTol(d.tolMinus, d.tolPlus, d.decimals)}</span>{isAttributeGauge(d.gauge) && <span className="ml-1 font-sans text-brand">GO / NO-GO</span>}</div>
                   <div className="text-[11px] text-ink-3/80 leading-tight">{GAUGES[d.gauge]?.nameZh} · {FREQUENCIES[d.frequency]}{!requiredIds.has(d.id) && " · 非必量"}</div>
                 </th>
               ))}
@@ -139,7 +154,7 @@ export function Workspace({ lot }: { lot: LotDetail }) {
               const revFind = p.findings.filter((f) => f.judgement === "REVIEW").length;
               return (
                 <tr key={p.id} className="group">
-                  <td className="sticky left-0 z-[5] bg-panel group-hover:bg-canvas/60 px-3 py-1 border-b border-r border-line">
+                  <td className="sticky left-0 z-[5] bg-panel group-hover:bg-[#f4f6fa] px-3 py-1 border-b border-r border-line">
                     <button type="button" onClick={() => setOpenPiece(p.id)} className="flex items-center gap-2 h-9 w-full text-left rounded hover:bg-brand-soft/60 px-1 -mx-1" title="開啟件面板:外觀缺陷、拍照、覆判、處置">
                       <span className="num font-semibold w-8">#{p.seqNo}</span>
                       <VerdictBadge v={v} />
@@ -152,6 +167,37 @@ export function Workspace({ lot }: { lot: LotDetail }) {
                   {dims.map((d, di) => {
                     const k = key(p.id, d.id);
                     const m = p.measurements.find((x) => x.dimensionSpecId === d.id);
+                    const attr = m?.attribute ?? null;
+                    const j = judgeOf(k);
+                    if (isAttributeGauge(d.gauge)) {
+                      const cur: "go" | "nogo" | null = k in judgeOv ? (judgeOv[k] === "OK" ? "go" : judgeOv[k] === "NG" ? "nogo" : null) : attr;
+                      return (
+                        <td key={d.id} className="px-1.5 py-1 border-b border-line">
+                          <div className="flex h-11 rounded-md border border-line-2 overflow-hidden bg-white" data-saving={saving[k] ? "1" : "0"} role="group" aria-label={`${d.name} 通 / 不通`}>
+                            <button
+                              type="button"
+                              ref={(el) => { if (el) refs.current.set(k, el as unknown as HTMLInputElement); else refs.current.delete(k); }}
+                              disabled={closed}
+                              onClick={() => { void commitAttr(p.id, d.id, cur === "go" ? null : "go"); focusNext(pi, di); }}
+                              onKeyDown={(e) => {
+                                if (e.key === "ArrowDown" && pi < lot.pieces.length - 1) { e.preventDefault(); (refs.current.get(key(lot.pieces[pi + 1].id, d.id)) as HTMLElement | undefined)?.focus(); }
+                                else if (e.key === "ArrowUp" && pi > 0) { e.preventDefault(); (refs.current.get(key(lot.pieces[pi - 1].id, d.id)) as HTMLElement | undefined)?.focus(); }
+                                else if (e.key === "0" || e.key.toLowerCase() === "n") { e.preventDefault(); void commitAttr(p.id, d.id, "nogo"); focusNext(pi, di); }
+                                else if (e.key === "1" || e.key.toLowerCase() === "g") { e.preventDefault(); void commitAttr(p.id, d.id, "go"); focusNext(pi, di); }
+                              }}
+                              className={`flex-1 text-[13px] font-semibold transition-colors focus:outline-none focus:ring-[3px] focus:ring-brand-soft ${cur === "go" ? "bg-ok-soft text-ok" : "text-ink-3 hover:bg-canvas"}`}
+                            >通</button>
+                            <div className="w-px bg-line-2" />
+                            <button
+                              type="button"
+                              disabled={closed}
+                              onClick={() => { void commitAttr(p.id, d.id, cur === "nogo" ? null : "nogo"); focusNext(pi, di); }}
+                              className={`flex-1 text-[14px] font-semibold transition-colors focus:outline-none focus:ring-[3px] focus:ring-brand-soft ${cur === "nogo" ? "bg-ng-soft text-ng" : "text-ink-3 hover:bg-canvas"}`}
+                            >不通</button>
+                          </div>
+                        </td>
+                      );
+                    }
                     return (
                       <td key={d.id} className="px-1.5 py-1 border-b border-line">
                         <input
@@ -163,13 +209,13 @@ export function Workspace({ lot }: { lot: LotDetail }) {
                           disabled={closed}
                           defaultValue={m ? m.value.toFixed(d.decimals) : ""}
                           data-prev={m ? m.value.toFixed(d.decimals) : ""}
-                          data-j={judgeOf(k) ?? ""}
+                          data-j={j ?? ""}
                           data-saving={saving[k] ? "1" : "0"}
                           placeholder={requiredIds.has(d.id) ? "必量" : "—"}
                           onKeyDown={(e) => {
                             if (e.key === "Enter") { e.preventDefault(); void commit(p.id, d.id, e.currentTarget.value, e.currentTarget); focusNext(pi, di); }
-                            else if (e.key === "ArrowDown" && pi < lot.pieces.length - 1) { e.preventDefault(); refs.current.get(key(lot.pieces[pi + 1].id, d.id))?.focus(); }
-                            else if (e.key === "ArrowUp" && pi > 0) { e.preventDefault(); refs.current.get(key(lot.pieces[pi - 1].id, d.id))?.focus(); }
+                            else if (e.key === "ArrowDown" && pi < lot.pieces.length - 1) { e.preventDefault(); (refs.current.get(key(lot.pieces[pi + 1].id, d.id)) as HTMLElement | undefined)?.focus(); }
+                            else if (e.key === "ArrowUp" && pi > 0) { e.preventDefault(); (refs.current.get(key(lot.pieces[pi - 1].id, d.id)) as HTMLElement | undefined)?.focus(); }
                           }}
                           onBlur={(e) => void commit(p.id, d.id, e.currentTarget.value, e.currentTarget)}
                           onFocus={(e) => e.currentTarget.select()}
@@ -197,6 +243,7 @@ export function Workspace({ lot }: { lot: LotDetail }) {
         <div className="px-5 py-2.5 text-[12px] text-ink-3 border-t border-line flex flex-wrap gap-4">
           <span>點件號開啟件面板:記錄外觀缺陷、拍照、人工覆判、處置</span>
           <span>綠=允收 · 黃=接近公差邊緣(警戒)· 紅=超差</span>
+          <span>塞規 / 環規:點「通」或「不通」,鍵盤 <kbd className="px-1 rounded border border-line-2 bg-white">1</kbd>=通 <kbd className="px-1 rounded border border-line-2 bg-white">0</kbd>=不通</span>
         </div>
       )}
     </section>

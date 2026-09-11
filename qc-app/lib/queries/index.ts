@@ -5,6 +5,7 @@ import {
 } from "@/db/schema";
 import { and, asc, desc, eq, gte, inArray, lt, sql } from "drizzle-orm";
 import { dimensionStats } from "@/lib/engine";
+import { isAttributeGauge } from "@/lib/domain";
 
 /** 所有 query 進來先確保 migration 跑過 */
 async function ready() {
@@ -128,13 +129,15 @@ export async function getLotDetail(id: number) {
     findings: finds.filter((f) => f.pieceId === p.id),
   }));
 
-  const stats = dims.map((d) => ({
-    dim: d,
-    stats: dimensionStats(
-      meas.filter((m) => m.dimensionSpecId === d.id).map((m) => ({ value: m.value, judgement: m.judgement })),
-      d,
-    ),
-  }));
+  const stats = dims.map((d) => {
+    const ms = meas.filter((m) => m.dimensionSpecId === d.id);
+    if (isAttributeGauge(d.gauge)) {
+      // 塞規 / 環規:只有通 / 不通,沒有 min/max/Cpk
+      const ok = ms.filter((m) => m.attribute === "go").length;
+      return { dim: d, stats: { n: ms.length, min: null, max: null, mean: null, stdev: null, cp: null, cpk: null, ok, warn: 0, ng: ms.length - ok } };
+    }
+    return { dim: d, stats: dimensionStats(ms.map((m) => ({ value: m.value, judgement: m.judgement })), d) };
+  });
 
   const summary = {
     total: piecesFull.length,
