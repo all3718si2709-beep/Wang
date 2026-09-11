@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  --color-ink: #0f172a;
+  --color-ink-2: #334155;
+  --color-ink-3: #64748b;
+  --color-line: #e2e8f0;
+  --color-line-2: #cbd5e1;
+  --color-canvas: #f1f5f9;
+  --color-panel: #ffffff;
+  --color-brand: #1d4ed8;
+  --color-brand-2: #1e3a8a;
+  --color-brand-soft: #dbeafe;
+
+  --color-ok: #15803d;
+  --color-ok-soft: #dcfce7;
+  --color-warn: #b45309;
+  --color-warn-soft: #fef3c7;
+  --color-ng: #b91c1c;
+  --color-ng-soft: #fee2e2;
+  --color-review: #6d28d9;
+  --color-review-soft: #ede9fe;
+  --color-pending: #64748b;
+  --color-pending-soft: #f1f5f9;
+}
+
+html { color-scheme: light; }
+body { background: var(--color-canvas); color: var(--color-ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+
+/* 數字欄位等寬,對齊 */
+@utility num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 量測格 */
+.cell-input {
+  @apply w-full h-11 px-2 text-right text-[15px] rounded-md border bg-white outline-none transition-colors;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  border-color: var(--color-line-2);
+}
+.cell-input:focus { border-color: var(--color-brand); box-shadow: 0 0 0 3px var(--color-brand-soft); }
+.cell-input[data-j="OK"] { background: var(--color-ok-soft); border-color: #86efac; }
+.cell-input[data-j="WARN"] { background: var(--color-warn-soft); border-color: #fcd34d; }
+.cell-input[data-j="NG"] { background: var(--color-ng-soft); border-color: #fca5a5; color: var(--color-ng); font-weight: 600; }
+.cell-input[data-saving="1"] { opacity: .6; }
+
+@media print {
+  body { background: #fff; }
+  .no-print { display: none !important; }
+  .print-page { break-after: page; }
+  @page { size: A4; margin: 14mm 12mm; }
+}
