@@ -51,7 +51,7 @@
 </div></header>
 
 <nav class="toc">
-  <a href="#overview">整體流程</a><a href="#s1">1 第一次使用</a><a href="#s2">2 建料號與規格</a><a href="#s3">3 開檢驗批</a><a href="#s4">4 量尺寸</a><a href="#s5">5 記外觀</a><a href="#s6">6 判定與結批</a><a href="#s7">7 出報告</a><a href="#s8">8 退供應商</a><a href="#ai">AI 檢測</a><a href="#faq">常見問題</a>
+  <a href="#overview">整體流程</a><a href="#s1">1 第一次使用</a><a href="#s2">2 建料號與規格</a><a href="#s3">3 開檢驗批</a><a href="#s4">4 量尺寸</a><a href="#wear">4.5 看趨勢(刀具磨耗)</a><a href="#s5">5 記外觀</a><a href="#s6">6 判定與結批</a><a href="#s7">7 出報告</a><a href="#s8">8 退供應商</a><a href="#ai">AI 檢測</a><a href="#faq">常見問題</a>
 </nav>
 
 <main>
@@ -125,6 +125,26 @@
   <tr><th>逐件</th><td>一件量完所有項次再換下一件。零件很大、搬動麻煩時用。</td></tr></table>
   <div class="note"><b>藍牙量具(三豐):</b>接收器 U-WAVE-R 插電腦 USB,用 U-WAVEPAK 設成 Keyboard 模式、資料後加 Enter(設一次)。之後量具按 DATA 鍵 = 自動打字 + Enter,系統不用任何設定。游標在哪格,值就進哪格。</div>
   <div class="tip"><b>打錯:</b>回到那格改掉再按 Enter 就覆蓋。想清空就刪掉內容按 Enter。<kbd>↑</kbd><kbd>↓</kbd> 可以在同一欄上下移動。</div>
+</section>
+
+
+<section id="wear">
+  <h2><span class="n">4.5</span>看趨勢:刀具磨耗的例子</h2>
+  <div class="who">誰看:檢驗員量的時候就會看到;品管 / 加工主管每天掃一眼</div>
+  <p>黃色「警戒」的意思是<b>合格,但已經用掉 80% 公差</b>。單一格黃沒關係;<b>整欄變黃、而且數值都往同一邊偏</b>,就是機台在告訴你:刀具磨耗或熱變形,再不處理下一批就會紅。</p>
+  <img class="shot" src="manual/14-wear-grid.png" alt="刀具磨耗範例"><div class="cap">示範批 L-260910-001(8" 閥板):「總厚」標稱 38.000 ±0.100,整欄都落在 38.05~38.09,往上限靠;#5、#7 已經超差變紅。「密封面高度」同樣一整欄黃。這不是量錯,是車床那把刀磨耗,每件越車越厚。</div>
+  <h3>怎麼讀</h3>
+  <table>
+    <tr><th style="width:34%">看到什麼</th><th>代表</th><th>做什麼</th></tr>
+    <tr><td>零星幾格黃,數值有正有負</td><td>正常散布</td><td>不用動</td></tr>
+    <tr><td>整欄黃,數值都偏同一邊(都偏大或都偏小)</td><td><b>刀具磨耗 / 刀補跑掉 / 機台熱變形</b></td><td>通知加工:量刀、補刀補值。<b>趁還是黃的時候補,別等紅</b></td></tr>
+    <tr><td>前面綠、越後面越黃、最後幾件紅</td><td>磨耗在這批中間發生</td><td>紅的件重工或報廢;回頭確認黃的那幾件要不要一起重工</td></tr>
+    <tr><td>只有關鍵特性(CTQ)黃,其他正常</td><td>那一道製程 / 那把刀的問題</td><td>看是哪支刀車那個尺寸</td></tr>
+  </table>
+  <h3>報告上的 Cpk</h3>
+  <img class="shot" src="manual/15-wear-report.png" alt="尺寸統計"><div class="cap">同一批的檢驗報告「尺寸檢驗結果」:Mean 偏離標稱、Cpk 掉到 1 以下,就是量化的證據。</div>
+  <div class="note"><b>Cpk 怎麼看:</b>≥ 1.33 穩;1.00~1.33 勉強;&lt; 1.00 這批一定會有超差。Cpk 低但 Cp 高 = 散布小但<b>中心偏了</b>,補刀補值就能救;Cp 也低 = 散布大,是機台或量具的問題。</div>
+  <div class="tip"><b>警戒比例可以調:</b>規格頁「判定參數」的警戒比例預設 0.8。公差很緊的料號可以設 0.7 提早報;公差很鬆的設 0.9 免得整天黃。</div>
 </section>
 
 <section id="s5">
