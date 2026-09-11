@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, ClipboardList, Boxes, Building2, Factory, FileBarChart2, Settings, ShieldCheck } from "lucide-react";
+import { LayoutDashboard, ClipboardList, Boxes, Building2, Factory, FileBarChart2, Settings, ShieldCheck, BookOpen } from "lucide-react";
 import { useState } from "react";
 
 const items = [
@@ -56,6 +56,9 @@ export function Nav() {
             );
           })}
         </nav>
+        <a href="/manual.html" target="_blank" rel="noreferrer" className="flex items-center gap-3 mx-2 mb-1 px-3 h-11 rounded-md text-[14px] text-blue-100/85 hover:bg-white/10 hover:text-white">
+          <BookOpen className="h-[18px] w-[18px]" />操作說明
+        </a>
         <div className="px-5 py-4 text-[11px] text-blue-200/60 border-t border-white/10">資料留在本機 · 不上雲</div>
       </aside>
       {open && <div className="md:hidden fixed inset-0 z-20 bg-black/30" onClick={() => setOpen(false)} />}

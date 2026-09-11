@@ -88,8 +88,8 @@ export function PiecePanel({ lot, piece, onClose, onChanged }: { lot: LotDetail;
                       {/* eslint-disable-next-line @next/next/no-img-element -- 本機照片,不走影像最佳化 */}
                       {f.photoPath ? <a href={`/api/photos/${f.photoPath}`} target="_blank" rel="noreferrer" className="shrink-0"><img src={`/api/photos/${f.photoPath}`} alt="" className="h-16 w-16 object-cover rounded" /></a> : <div className="h-16 w-16 shrink-0 rounded bg-canvas grid place-items-center text-ink-3"><Camera className="h-5 w-5" /></div>}
                       <div className="flex-1 min-w-0 text-[12.5px]">
-                        <div className="flex items-center gap-2"><VerdictBadge v={f.judgement} /><span className="font-medium"><span className="num">{f.defectCode}</span> {def?.nameZh}</span><span className="text-ink-3">· {zoneByCode(f.zone)?.nameZh}</span></div>
-                        <div className="mt-1 text-ink-3 num">{f.sizeMm != null ? `${f.sizeMm} mm` : "尺寸未填"} · ×{f.count}{f.clockPosition ? ` · ${f.clockPosition} 點鐘` : ""} · {f.responsibility === "supplier" ? "上游責任" : "廠內責任"}</div>
+                        <div className="flex items-center gap-2"><VerdictBadge v={f.judgement} /><span className="font-medium">{f.defectCode !== "AI" && <span className="num mr-1">{f.defectCode}</span>}{def?.nameZh}</span><span className="text-ink-3">· {zoneByCode(f.zone)?.nameZh}</span></div>
+                        <div className="mt-1 text-ink-3 num">{f.sizeMm != null ? `${Number(f.sizeMm.toFixed(2))} mm` : "尺寸未填"} · ×{f.count}{f.clockPosition ? ` · ${f.clockPosition} 點鐘` : ""} · {f.responsibility === "supplier" ? "上游責任" : "廠內責任"}</div>
                         {f.note && <div className="mt-0.5 text-ink-2">{f.note}</div>}
                       </div>
                       {!closed && <button className="self-start p-1.5 text-ink-3 hover:text-ng" onClick={async () => { if (confirm("刪除此筆發現?")) { await deleteFinding(f.id); onChanged(); } }} aria-label="刪除"><Trash2 className="h-4 w-4" /></button>}
@@ -124,7 +124,7 @@ export function PiecePanel({ lot, piece, onClose, onChanged }: { lot: LotDetail;
                 <div>
                   <div className="text-[12px] font-medium text-ink-2 mb-1">缺陷類型</div>
                   <div className="flex flex-wrap gap-1.5">
-                    {DEFECT_CODES.map((d) => <Chip key={d.code} on={code === d.code} onClick={() => setCode(d.code)} accent={d.common}><span className="num font-semibold mr-1">{d.code}</span>{d.nameZh}</Chip>)}
+                    {DEFECT_CODES.filter((d) => d.code !== "AI").map((d) => <Chip key={d.code} on={code === d.code} onClick={() => setCode(d.code)} accent={d.common}><span className="num font-semibold mr-1">{d.code}</span>{d.nameZh}</Chip>)}
                   </div>
                   <input type="hidden" name="defectCode" value={code} />
                 </div>
