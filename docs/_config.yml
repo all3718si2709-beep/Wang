@@ -1,0 +1,7 @@
+title: 閥門零件 AI 檢驗與製程優化
+description: 代工廠圓形閥門鑄件的品質檢驗數位化、外觀 AI 檢測、與製程數據分析
+theme: jekyll-theme-cayman
+lang: zh-Hant
+show_downloads: false
+exclude:
+  - "*.bak"

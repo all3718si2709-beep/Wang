@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>品質檢驗系統 操作說明</title>
+<style>
+  :root { --ink:#0f172a; --ink2:#334155; --ink3:#64748b; --line:#e2e8f0; --brand:#1d4ed8; --brand2:#1e3a8a; --soft:#dbeafe; --ok:#15803d; --warn:#b45309; --ng:#b91c1c; --rev:#6d28d9; }
+  * { box-sizing:border-box }
+  body { margin:0; font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif; color:var(--ink); background:#f8fafc; font-size:16px; line-height:1.7 }
+  header { background:var(--brand2); color:#fff; padding:36px 24px }
+  header .wrap { max-width:960px; margin:0 auto }
+  header h1 { margin:0 0 6px; font-size:28px }
+  header p { margin:0; color:#bfdbfe }
+  nav.toc { max-width:960px; margin:0 auto; padding:16px 24px; display:flex; flex-wrap:wrap; gap:8px }
+  nav.toc a { background:#fff; border:1px solid var(--line); border-radius:999px; padding:6px 14px; font-size:14px; color:var(--ink2); text-decoration:none }
+  nav.toc a:hover { border-color:var(--brand); color:var(--brand) }
+  main { max-width:960px; margin:0 auto; padding:8px 24px 80px }
+  section { background:#fff; border:1px solid var(--line); border-radius:12px; padding:24px 28px; margin:20px 0 }
+  h2 { margin:0 0 4px; font-size:22px; display:flex; align-items:center; gap:10px }
+  h2 .n { display:inline-grid; place-items:center; width:32px; height:32px; border-radius:8px; background:var(--brand); color:#fff; font-size:16px }
+  h3 { font-size:17px; margin:22px 0 6px; color:var(--brand2) }
+  .who { color:var(--ink3); font-size:14px; margin-bottom:14px }
+  ol.steps { padding-left:0; list-style:none; counter-reset:s; margin:12px 0 }
+  ol.steps li { counter-increment:s; position:relative; padding:8px 0 8px 44px; border-top:1px dashed var(--line) }
+  ol.steps li:first-child { border-top:0 }
+  ol.steps li::before { content:counter(s); position:absolute; left:0; top:10px; width:28px; height:28px; border-radius:50%; background:var(--soft); color:var(--brand2); font-weight:700; display:grid; place-items:center; font-size:14px }
+  img.shot { width:100%; border:1px solid var(--line); border-radius:8px; margin:10px 0 4px; box-shadow:0 1px 3px rgba(15,23,42,.06) }
+  .cap { font-size:13px; color:var(--ink3); margin-bottom:8px }
+  .tip { background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:10px 14px; margin:12px 0; font-size:15px }
+  .tip b { color:var(--warn) }
+  .note { background:var(--soft); border:1px solid #bfdbfe; border-radius:8px; padding:10px 14px; margin:12px 0; font-size:15px }
+  kbd { background:#f1f5f9; border:1px solid #cbd5e1; border-bottom-width:2px; border-radius:4px; padding:0 6px; font-family:ui-monospace,monospace; font-size:14px }
+  .tag { display:inline-block; padding:1px 8px; border-radius:4px; font-weight:700; font-size:14px; border:1px solid }
+  .ok { color:var(--ok); background:#dcfce7; border-color:#86efac } .warn { color:var(--warn); background:#fef3c7; border-color:#fcd34d }
+  .ng { color:var(--ng); background:#fee2e2; border-color:#fca5a5 } .rev { color:var(--rev); background:#ede9fe; border-color:#c4b5fd } .pend { color:var(--ink3); background:#f1f5f9; border-color:#cbd5e1 }
+  table { border-collapse:collapse; width:100%; font-size:15px; margin:10px 0 }
+  th,td { border:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:top }
+  th { background:#f8fafc; color:var(--ink2); font-weight:600 }
+  .flow { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:10px 0 }
+  .flow span { background:var(--soft); color:var(--brand2); padding:8px 14px; border-radius:8px; font-weight:600 }
+  .flow i { color:var(--ink3); font-style:normal }
+  .case { background:#fff7ed; border:1px solid #fed7aa; border-radius:12px; padding:18px 24px; margin:20px 0 }
+  .case h2 { color:#9a3412 } .case table td:first-child { color:var(--ink3); width:32% }
+  .say { border-left:4px solid var(--brand); background:#f8fafc; padding:8px 14px; margin:10px 0; color:var(--ink2); font-size:15px }
+  footer { text-align:center; color:var(--ink3); font-size:13px; padding:20px }
+  @media (max-width:640px){ section{padding:18px 16px} header{padding:28px 16px} main{padding:8px 12px 60px} }
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>品質檢驗系統 操作說明</h1>
+  <p>閥門零件 · 規格引擎 + 檢驗紀錄 + 報告 · 資料留在本機 · 以一批真實流程為例逐步說明</p>
+</div></header>
+
+<nav class="toc">
+  <a href="#overview">整體流程</a><a href="#case">本說明的案例</a><a href="#s1">1 第一次使用</a><a href="#s2">2 建料號與規格</a><a href="#s3">3 開檢驗批</a><a href="#s4">4 量尺寸</a><a href="#gonogo">4.2 塞規 / 環規</a><a href="#wear">4.5 看趨勢(刀具磨耗)</a><a href="#s5">5 記外觀</a><a href="#s6">6 判定與結批</a><a href="#s7">7 出報告</a><a href="#s8">8 退供應商</a><a href="#ai">AI 檢測</a><a href="#faq">常見問題</a>
+</nav>
+
+<main>
+<section id="overview">
+  <h2>整體流程</h2>
+  <div class="flow"><span>建料號 + 規格</span><i>→</i><span>開檢驗批</span><i>→</i><span>量尺寸</span><i>→</i><span>記外觀</span><i>→</i><span>判定 / 結批</span><i>→</i><span>出報告</span></div>
+  <p>左邊選單就是這幾個頁面。<b>料號與規格</b>每個料號只做一次;<b>檢驗批</b>每批做一次。</p>
+  <img class="shot" src="01-dashboard.png" alt="儀表板"><div class="cap">儀表板:近 30 天概況、進行中的批、缺陷分布(橘 = 上游鑄造廠責任、紫 = 廠內責任)。</div>
+  <h3>判定顏色</h3>
+  <table><tr><th>標籤</th><th>意思</th></tr>
+  <tr><td><span class="tag ok">允收</span></td><td>合格</td></tr>
+  <tr><td><span class="tag warn">警戒</span></td><td>合格,但已經用掉 80% 公差,要注意(可能是刀具磨耗前兆)</td></tr>
+  <tr><td><span class="tag ng">拒收</span></td><td>不合格</td></tr>
+  <tr><td><span class="tag rev">待複判</span></td><td>系統不確定(規格沒定義這種情況、或 AI 抓到異常),<b>要由人判</b></td></tr>
+  <tr><td><span class="tag pend">未完成</span></td><td>該量的尺寸還沒量完</td></tr></table>
+</section>
+
+<section id="case" class="case">
+  <h2>本說明的案例:9/10 早班,台灣閥業 8" 閥板 30 件出貨前全檢</h2>
+  <p>底下每一步都用這一批當例子,畫面截圖就是這批的實際狀態。</p>
+  <table>
+    <tr><td>客戶 / 料號</td><td>台灣閥業股份有限公司 · <b>VD-8-150</b> 8" 閥板 Class 150 · 圖面 Rev B · 材質 ASTM A216 WCB</td></tr>
+    <tr><td>鼎新工單 / 採購批</td><td>WO-2609-444 / PO-2608-32</td></tr>
+    <tr><td>毛胚</td><td>大甲鑄造廠 · 爐號 H26103C</td></tr>
+    <tr><td>數量 / 類別</td><td>30 件 · FQC 出貨前全檢</td></tr>
+    <tr><td>檢驗員</td><td>林志豪(車床 #3 加工完下線)</td></tr>
+    <tr><td>批號</td><td>系統自動編 <b>L-260910-001</b></td></tr>
+    <tr><td>這批發生的事</td><td>量到第 18 件:「總厚」整欄往上限飄、2 件超差(刀具磨耗);#3 內孔有 0.57mm 氣孔超過 0.5 上限;#17 非加工面夾砂 1.57mm 超過 1.5 上限 → 這兩件退大甲鑄造廠</td></tr>
+  </table>
+</section>
+
+<section id="s1">
+  <h2><span class="n">1</span>第一次使用(只做一次)</h2>
+  <div class="who">誰做:品管主管</div>
+  <ol class="steps">
+    <li>點左邊 <b>設定</b> → 填公司名稱、地址、電話 → 儲存。這會印在報告抬頭上。</li>
+    <li>點 <b>客戶</b> → 右邊「新增客戶」:代號 <code>C001</code>、名稱「台灣閥業股份有限公司」→ 新增。備註可以寫這家客戶的脾氣,例如「密封面鑄孔零容忍」。</li>
+    <li>點 <b>供應商</b> → 新增「大甲鑄造廠」「彰化精密鑄造」等上游鑄造廠(退貨報表會依供應商分)。</li>
+  </ol>
+  <img class="shot" src="02-customers.png" alt="客戶"><div class="cap">客戶頁:左邊清單可直接改,右邊新增。</div>
+</section>
+
+<section id="s2">
+  <h2><span class="n">2</span>建料號與允收標準(每個料號一次)</h2>
+  <div class="who">誰做:品管主管,拿著客戶圖面 DWG-VD-8-150 Rev B</div>
+  <ol class="steps">
+    <li>點 <b>料號與規格</b> → 右上「新增料號」→ 客戶選台灣閥業、料號 <code>VD-8-150</code>、品名「8" 閥板 Class 150」、圖號 / 版次、材質、吋數 8 → 建立。</li>
+    <li>進到料號頁 → 按「<b>建立第一版</b>」。</li>
+    <li><b>一、尺寸項次</b>:按「新增項次」,照圖面一項一項填。以這個料號為例:<br>
+      項次 2「總厚」標稱 38.000、下公差 −0.100、上公差 +0.100、量具 <b>分厘卡</b>、頻率 <b>每件</b>、勾關鍵特性;<br>
+      項次 1「外徑」203.200 ±0.100、量具 <b>三次元</b>、頻率 <b>抽檢</b>;<br>
+      項次 5「軸孔直徑」32.000、下公差 0、上公差 +0.025(單邊)、量具 <b>塞規 / 環規</b>、每件 → 檢驗畫面會變成「通 / 不通」按鈕(見 4.2)。<br>
+      <b>頻率</b>怎麼選:分厘卡 / 高度規 / 卡尺量的填「每件」;三次元量的填「抽檢」或「首件」。</li>
+    <li><b>二、外觀允收矩陣</b>:一開始全部是「拒收」。依台灣閥業的規範放寬:<br>
+      「外圓 / 端面 / 內孔 × III 夾砂、IV 氣孔」勾允許、≤ <b>0.5</b> mm、× <b>2</b> 個;<br>
+      「非加工面 × III / IV」允許、≤ <b>1.5</b> mm、× 5;<br>
+      「密封面」整欄留拒收 → 儲存外觀矩陣。</li>
+    <li>右上按「<b>生效此版本</b>」。生效後就鎖住不能改。</li>
+  </ol>
+  <img class="shot" src="05-spec.png" alt="規格頁"><div class="cap">VD-8-150 規格 v2(生效中):上面 13 個尺寸項次,中間外觀矩陣(紅 = 拒收、綠 = 允許及上限)。</div>
+  <img class="shot" src="04-part.png" alt="料號頁"><div class="cap">料號頁的版本歷史:v1 已停用、v2 生效中。8 月客戶圖面改 Rev B 收緊總厚公差,就是「開新版 → 改 → 生效」做的。</div>
+  <div class="note"><b>規格要改怎麼辦?</b> 回料號頁按「以現行版本開新版」→ 系統複製一份新草稿 → 改 → 生效。8 月之前的批仍然用 v1 判定,報告永遠對得上。</div>
+  <div class="tip"><b>提示:</b>外觀矩陣不用一次填完 84 格。先認真定「III 夾砂、IV 氣孔、R 鏽蝕」在各區域的上限,其他留拒收。沒定義到的情況系統會標「待複判」由人判,之後再開新版補進去。</div>
+</section>
+
+<section id="s3">
+  <h2><span class="n">3</span>開檢驗批(每批一次)</h2>
+  <div class="who">誰做:檢驗員林志豪,車床 #3 下線後</div>
+  <ol class="steps">
+    <li>點 <b>檢驗批</b> → 右上「開新檢驗批」。</li>
+    <li>料號選 <code>C001 · VD-8-150</code>、類別 <b>FQC 最終檢驗</b>、數量 <b>30</b>。</li>
+    <li>從鼎新工單抄:工單號 <code>WO-2609-444</code>、採購批 <code>PO-2608-32</code>;毛胚供應商選大甲鑄造廠、爐號 <code>H26103C</code>(看鑄件上的爐號打印或材證);檢驗員填自己。</li>
+    <li>批號留空 → 系統自動編 <b>L-260910-001</b>(L-年月日-流水號)。按「建立批並開始檢驗」。</li>
+  </ol>
+  <img class="shot" src="06-lot-new.png" alt="開新檢驗批"><div class="cap">填好的樣子。這些欄位之後會印在報告上、也是退大甲鑄造廠時的證據(採購批 + 爐號)。</div>
+  <div class="tip"><b>擺件:</b>30 件依序排在檢驗台上,#1 ~ #30 對應實體順序,量到一半才不會亂。有刻字的可以在件面板填序號。</div>
+</section>
+
+<section id="s4">
+  <h2><span class="n">4</span>量尺寸</h2>
+  <div class="who">誰做:檢驗員</div>
+  <img class="shot" src="07-grid.png" alt="量測表格"><div class="cap">L-260910-001 量到第 18 件的樣子。每一列是一件,每一欄是一個「每件」項次:總厚(分厘卡)、密封面高度(高度規)、軸孔直徑(塞規)、鍵槽寬(卡尺)…。綠 = 合格、黃 = 警戒、紅 = 超差。</div>
+  <ol class="steps">
+    <li>拿起<b>分厘卡</b>,點「2. 總厚」的第一格(#1)。</li>
+    <li>量 #1 → 藍牙分厘卡按 DATA 鍵(或手打 <code>38.051</code>)→ <kbd>Enter</kbd> → 游標<b>自動跳到 #2</b>。</li>
+    <li>一路量到 #30 → 游標自動跳到「4. 密封面高度」的 #1 → 放下分厘卡,換<b>高度規</b>。</li>
+    <li>三次元量的項目(外徑、內孔直徑、PCD…)不在這裡打,三次元報告先歸檔;想手填就勾右上「顯示抽檢 / 首件項次」。</li>
+  </ol>
+  <div class="say">林志豪量到 #5 打了 38.107,格子變紅 — 超過上限 38.100。不用停下來,先量完,紅的件系統已經記住是「拒收」。</div>
+  <h3>逐項 vs 逐件(右上切換)</h3>
+  <table><tr><th>逐項(預設)</th><td>同一支量具量完全部件再換下一項。30 件 × 6 個每件項次 = 只換 6 次量具,最快。</td></tr>
+  <tr><th>逐件</th><td>一件量完所有項次再換下一件。14" Disc 這種很重、搬一次很累的用這個。</td></tr></table>
+  <div class="note"><b>藍牙量具(三豐):</b>接收器 U-WAVE-R 插電腦 USB,用 U-WAVEPAK 設成 Keyboard 模式、資料後加 Enter(設一次)。之後量具按 DATA 鍵 = 自動打字 + Enter,系統不用任何設定。游標在哪格,值就進哪格。</div>
+  <div class="tip"><b>打錯:</b>回到那格改掉再按 Enter 就覆蓋。想清空就刪掉內容按 Enter。<kbd>↑</kbd><kbd>↓</kbd> 可以在同一欄上下移動。</div>
+</section>
+
+<section id="gonogo">
+  <h2><span class="n">4.2</span>塞規 / 環規:通 / 不通按鈕</h2>
+  <div class="who">誰做:檢驗員</div>
+  <p>塞規、環規、螺紋規這種量具<b>沒有數值</b>,只有「通端進得去、止端進不去」。所以量具設成「塞規 / 環規」的項次,格子不是數字欄,是兩顆按鈕。</p>
+  <div class="say">還是 L-260910-001。項次 5「軸孔直徑」32.000 +0.025/0 用塞規:林志豪拿 32.000 通端和 32.025 止端,每件塞一下 — 通端進、止端不進就按「通」;通端進不去或止端也進得去就按「不通」。</div>
+  <img class="shot" src="16-gonogo.png" alt="塞規通不通"><div class="cap">「5. 軸孔直徑」欄:表頭標 GO / NO-GO,每格兩顆按鈕。#6 那件鍵槽寬超差是另一欄的事,塞規欄全通。</div>
+  <h3>操作</h3>
+  <ol class="steps">
+    <li>點該項次第一格的「<b>通</b>」或「<b>不通</b>」→ 格子變綠 / 紅,游標<b>自動跳到下一件</b>(跟數字欄 Enter 一樣)。</li>
+    <li>要用鍵盤:游標在格子上時按 <kbd>1</kbd> 或 <kbd>G</kbd> = 通、<kbd>0</kbd> 或 <kbd>N</kbd> = 不通,自動跳下一件。整批 30 件只要按 30 下。</li>
+    <li>按錯了:再點一次同一顆按鈕就清掉,或直接點另一顆。</li>
+    <li>不通的件立刻變「拒收」,不用再做別的。</li>
+  </ol>
+  <h3>建規格時怎麼設</h3>
+  <table>
+    <tr><th style="width:30%">欄位</th><th>填法</th></tr>
+    <tr><td>量具</td><td>選「<b>塞規 / 環規(通/不通)</b>」— 選了這個,檢驗畫面就變按鈕</td></tr>
+    <tr><td>標稱 / 公差</td><td>照圖面填(例如 32.000、0、+0.025),報告上要印;判定不看它,只看通 / 不通</td></tr>
+    <tr><td>頻率</td><td>塞規很快,通常「每件」</td></tr>
+  </table>
+  <div class="note"><b>報告上怎麼呈現:</b>尺寸統計那一列不會有 Min / Max / Cpk(沒數值),改印「通 28 / 不通 2」;逐件附錄印「通」「不通」。</div>
+  <div class="tip"><b>什麼時候該用塞規、什麼時候該量數字:</b>只要判合不合格的用塞規(快);想看趨勢、算 Cpk、跟客戶談製程能力的用三次元或分厘卡量數字。同一個尺寸也可以兩個項次都建:每件塞規 + 每 10 件三次元。</div>
+</section>
+
+<section id="wear">
+  <h2><span class="n">4.5</span>看趨勢:刀具磨耗的例子</h2>
+  <div class="who">誰看:檢驗員量的時候就會看到;品管 / 加工主管每天掃一眼</div>
+  <div class="say">還是這一批。林志豪量完總厚整欄,發現 18 件裡 #2 黃、#5 #7 紅,其他全部落在 38.05~38.09 — 都往上限靠。他把畫面拿給車床 #3 的師傅看:「刀該補了。」</div>
+  <p>黃色「警戒」的意思是<b>合格,但已經用掉 80% 公差</b>。單一格黃沒關係;<b>整欄變黃、而且數值都往同一邊偏</b>,就是機台在告訴你:刀具磨耗或熱變形,再不處理下一批就會紅。</p>
+  <img class="shot" src="14-wear-grid.png" alt="刀具磨耗範例"><div class="cap">L-260910-001:「總厚」標稱 38.000 ±0.100,整欄都落在 38.05~38.09,往上限靠;#5、#7 已經超差變紅。「密封面高度」同樣一整欄黃。這不是量錯,是車床那把刀磨耗,每件越車越厚。</div>
+  <h3>怎麼讀</h3>
+  <table>
+    <tr><th style="width:34%">看到什麼</th><th>代表</th><th>做什麼</th></tr>
+    <tr><td>零星幾格黃,數值有正有負</td><td>正常散布</td><td>不用動</td></tr>
+    <tr><td>整欄黃,數值都偏同一邊(都偏大或都偏小)</td><td><b>刀具磨耗 / 刀補跑掉 / 機台熱變形</b></td><td>通知加工:量刀、補刀補值。<b>趁還是黃的時候補,別等紅</b></td></tr>
+    <tr><td>前面綠、越後面越黃、最後幾件紅</td><td>磨耗在這批中間發生</td><td>紅的件重工或報廢;回頭確認黃的那幾件要不要一起重工</td></tr>
+    <tr><td>只有關鍵特性(CTQ)黃,其他正常</td><td>那一道製程 / 那把刀的問題</td><td>看是哪支刀車那個尺寸</td></tr>
+  </table>
+  <h3>報告上的 Cpk</h3>
+  <img class="shot" src="15-wear-report.png" alt="尺寸統計"><div class="cap">同一批的檢驗報告「尺寸檢驗結果」:Mean 偏離標稱、Cpk 掉到 1 以下,就是量化的證據。</div>
+  <div class="note"><b>Cpk 怎麼看:</b>≥ 1.33 穩;1.00~1.33 勉強;&lt; 1.00 這批一定會有超差。Cpk 低但 Cp 高 = 散布小但<b>中心偏了</b>,補刀補值就能救;Cp 也低 = 散布大,是機台或量具的問題。</div>
+  <div class="tip"><b>警戒比例可以調:</b>規格頁「判定參數」的警戒比例預設 0.8。公差很緊的料號可以設 0.7 提早報;公差很鬆的設 0.9 免得整天黃。</div>
+</section>
+
+<section id="s5">
+  <h2><span class="n">5</span>記外觀(有缺陷才記)</h2>
+  <div class="who">誰做:檢驗員,目視 / 放大鏡看六個區域</div>
+  <div class="say">#3 翻過來看內孔,放大鏡下有一個小氣孔。拿針規比對約 0.57mm。</div>
+  <ol class="steps">
+    <li>點件號 <b>#3</b> → 右邊滑出「件面板」。</li>
+    <li>點區域 <b>內孔</b>。</li>
+    <li>點缺陷類型 <b>IV 氣孔</b>。</li>
+    <li>尺寸填 <code>0.57</code>、數量 1、時鐘方位 8(從標記點順時針看大約 8 點鐘位置)。責任預設「上游」不用改。</li>
+    <li>按「拍照」用平板相機拍下來(之後退大甲鑄造廠要用)。</li>
+    <li>看「引擎預判」:<span class="tag ng">拒收</span> — 內孔氣孔上限 0.5mm,0.57 超過 → 按「加入發現」。件 #3 立刻變拒收。</li>
+  </ol>
+  <img class="shot" src="08-panel.png" alt="件面板"><div class="cap">#3 的件面板:上半是這件 13 個尺寸的量測狀況,下半「外觀發現」已有那筆 0.57mm 氣孔,判拒收、責任上游。</div>
+  <div class="say">#17 非加工面有一塊夾砂,量起來 1.57mm。規格非加工面上限 1.5 → 也是拒收。#11 外圓有一小片鏽,量測前先看的沒發現,應該是加工後停放幾天長的 → 缺陷選 <b>R 鏽蝕</b>、責任改「<b>廠內</b>」、備註「加工後停放 6 天」。</div>
+  <div class="note">沒有缺陷的件<b>不用做任何事</b>,尺寸量完就自動判允收。責任歸屬預設:鑄造缺陷(I~XII)= 上游,鏽蝕 / 加工損傷 = 廠內,可以改。鏽蝕的備註很重要 — 累積幾個月就知道鏽是哪個站、哪個季節長出來的。</div>
+</section>
+
+<section id="s6">
+  <h2><span class="n">6</span>判定與結批</h2>
+  <div class="who">誰做:檢驗員 → 品管主管</div>
+  <h3>待複判的件</h3>
+  <div class="say">另一批 12" 法蘭(L-260907-003)的 #4 內孔有一道皺皮(VII),規格矩陣沒定義「內孔 × VII」→ 系統標<span class="tag rev">待複判</span>。品管主管對照 SP-55 比對板後判允收,理由寫「對照比對板 Level 2,可接受」。</div>
+  <img class="shot" src="09-review.png" alt="人工覆判"><div class="cap">件面板最下面「人工覆判」:填理由 → 判允收 / 判拒收。與引擎不同時一定要填理由,會留稽核紀錄。</div>
+  <ol class="steps">
+    <li><b>待複判</b>的件一定要由人判:開件面板 → 最下面「人工覆判」→ 填理由 → 判允收或判拒收。</li>
+    <li><b>拒收</b>的件選處置(件面板右上):#3、#17 鑄造缺陷 → <b>退回供應商</b>;#5、#7 總厚超差 → <b>重工</b>(車薄一點還救得回來)。</li>
+    <li>30 件都是允收或拒收後 → 批頁最下面「結批」→ 批結論選 <b>允收</b>(26 件出貨,4 件另處理)→ 結批並鎖定。</li>
+  </ol>
+  <img class="shot" src="10-close.png" alt="結批"><div class="cap">批頁下方:左邊批資料(鼎新工單、供應商、爐號可補改)、右邊結批。</div>
+  <div class="tip"><b>結批後欄位灰掉不能改?</b> 這是正常的(鎖定)。要補資料按「重開此批」。</div>
+</section>
+
+<section id="s7">
+  <h2><span class="n">7</span>出報告</h2>
+  <div class="who">誰做:檢驗員結批後,或業務出貨前</div>
+  <ol class="steps">
+    <li>批頁右上「<b>檢驗報告</b>」。</li>
+    <li>右上「列印 / 存 PDF」→ 印表機選「另存為 PDF」→ 檔案就是給台灣閥業的出貨檢驗報告,隨貨附上。</li>
+  </ol>
+  <img class="shot" src="11-report.png" alt="檢驗報告"><div class="cap">同料號 8/28 已結批的報告(L-260828-003,24 件允收):抬頭、基本資料(含鼎新工單、爐號、規格版本)、結果摘要、13 項尺寸統計含 Cpk、外觀分類(MSS SP-55)、拒收件明細與處置、三欄簽核、逐件附錄。</div>
+</section>
+
+<section id="s8">
+  <h2><span class="n">8</span>退供應商報表(每月)</h2>
+  <div class="who">誰做:品管主管,月初</div>
+  <div class="say">9 月要跟大甲鑄造廠對帳。點退供應商報表 → 選 2026-09 → 這個月判拒收、責任在上游的全部列出來:哪一批、哪個採購批、哪個爐號、第幾件、什麼缺陷、多大、照片。</div>
+  <ol class="steps">
+    <li>點 <b>退供應商報表</b> → 用 ‹ › 選月份。</li>
+    <li>系統依供應商分好,附照片、採購批、爐號。</li>
+    <li>列印 → 跟上游談退貨 / 扣款的證據。</li>
+  </ol>
+  <img class="shot" src="12-returns.png" alt="退供應商報表"><div class="cap">2026-09:大甲鑄造廠 3 筆(含 L-260910-001 的 #3 內孔氣孔 0.57mm、#17 夾砂 1.57mm)、越南 Thanh Long 1 筆。</div>
+</section>
+
+<section id="ai">
+  <h2>AI 外觀檢測(第 1 期,選用)</h2>
+  <p>AI 負責「看」,規則負責「判」,人負責「確認例外」。AI 抓到異常的件會自動變成「待複判」,附熱圖,人點開確認。</p>
+  <div class="say">12" 法蘭那批(L-260907-003)拍照後跑 AI,#7 端面 A 被標出一塊 1.2mm 的異常。檢驗員點開熱圖一看,是一個氣孔 → 把類型從「AI 偵測異常」改成 IV 氣孔,系統依規格判拒收。</div>
+  <img class="shot" src="09-ai.png" alt="AI 發現"><div class="cap">AI 帶進來的發現:縮圖是熱圖(紅色 = 不像正常的地方),類型先標「AI 偵測異常(待分類)」,由人改成真正的缺陷類型。(示範資料用的是公開資料集的金屬件圖,換成你們零件的照片後就是閥板。)</div>
+  <ol class="steps">
+    <li>開批後,零件放治具,用固定位置的手機 / 相機拍每一件,檔名 <code>01.jpg</code>、<code>02.jpg</code>… = 件號。</li>
+    <li>在電腦跑 <code>infer.py</code>(資料夾)→ <code>push_to_qc.py</code>(送進該批)。詳細在 <code>aoi/README.md</code>。</li>
+    <li>回到批頁,AI 判 NG 的件已標「待複判」→ 點開看熱圖 → 選真正的缺陷類型 → 判定。</li>
+  </ol>
+  <div class="note">AI 只用「OK 件」照片訓練,每個料號每一面各一個模型。要先照 <code>aoi/README.md</code> 的拍照規範拍 100~200 張 OK 件。</div>
+</section>
+
+<section id="faq">
+  <h2>常見問題</h2>
+  <table>
+    <tr><th style="width:40%">狀況</th><th>怎麼辦</th></tr>
+    <tr><td>開批時說「尚無生效的允收標準」</td><td>料號的規格還是草稿,回料號頁按「生效此版本」</td></tr>
+    <tr><td>料號下拉是空的</td><td>同上,或還沒建料號</td></tr>
+    <tr><td>量測格灰掉打不進去</td><td>批已結批,按「重開此批」</td></tr>
+    <tr><td>結批按了沒反應,說還有幾件未完成</td><td>有件的「每件」尺寸沒量完,或有待複判件沒人判。看件號旁的標籤</td></tr>
+    <tr><td>整欄黃色</td><td>不是量錯,是刀具磨耗 / 熱變形,見 4.5</td></tr>
+    <tr><td>待複判太多</td><td>外觀矩陣很多組合沒定義。開新版規格把常見組合定清楚</td></tr>
+    <tr><td>報告抬頭是「請至設定填入公司名稱」</td><td>設定頁填公司名稱</td></tr>
+    <tr><td>怎麼備份</td><td>複製整個 <code>qc-app/data/</code> 資料夾(裡面是資料庫 + 照片)</td></tr>
+    <tr><td>平板也能用嗎</td><td>可以,同一個 Wi-Fi,瀏覽器開 <code>http://電腦IP:3000</code>;拍照按鈕會直接開相機</td></tr>
+    <tr><td>要重新啟動系統</td><td>在 qc-app 資料夾執行 <code>pnpm start</code></td></tr>
+    <tr><td>示範資料要清掉</td><td>在 qc-app 資料夾執行 <code>pnpm db:seed</code>(會清空,只留一個空的示範料號)</td></tr>
+  </table>
+</section>
+</main>
+<footer>品質檢驗系統 · 操作說明 · 2026-09</footer>
+</body>
+</html>
