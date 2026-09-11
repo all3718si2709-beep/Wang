@@ -28,9 +28,11 @@ npm i -g pnpm
 cd qc-app
 pnpm install
 
-# 3. 建置 + 灌示範資料(只需一次;示範料號 VD-8-150 與一個批)
+# 3. 建置 + 灌資料(只需一次)
 pnpm build
-pnpm db:seed
+pnpm db:seed         # 最小示範:1 料號 1 批(正式上線用這個,之後自己建)
+# 或
+pnpm db:seed-demo    # 完整假資料:3 客戶、3 鑄造廠、6 料號、14 批(展示用;會清空資料庫!)
 
 # 4. 啟動
 pnpm start

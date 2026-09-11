@@ -41,7 +41,7 @@ export default async function SupplierReturnsPage({ searchParams }: { searchPara
                       <td className="num">{r.erpPoNo ?? "—"}{r.heatNo ? ` / ${r.heatNo}` : ""}</td>
                       <td className="num">{r.partNo}</td>
                       <td className="num">#{r.pieceSeq}</td>
-                      <td><span className="num font-semibold mr-1">{r.defectCode}</span>{defectByCode(r.defectCode)?.nameZh}</td>
+                      <td>{r.defectCode !== "AI" && <span className="num font-semibold mr-1">{r.defectCode}</span>}{defectByCode(r.defectCode)?.nameZh}</td>
                       <td>{zoneByCode(r.zone)?.nameZh}{r.clockPosition ? <span className="text-ink-3"> · {r.clockPosition} 點鐘</span> : null}</td>
                       <td className="text-right num">{r.sizeMm ?? "—"}</td>
                       <td className="text-right num">{r.count}</td>
